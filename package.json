@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "Chat Web Application",
   "main": "index.js",
+  "engines": {
+    "node": "12.13.1"
+  },
   "scripts": {
+    "preinstall": "yarn global add rimraf",
     "test": "mocha ./src/**/.test.js ./tests/**/.test.js --require @babel/register",
     "test:e2e": "mocha ./tests/e2e/*.test.js --require @babel/register",
     "test:unit": "mocha ./src/**/*.unit.test.js --require @babel/register",
@@ -11,8 +15,8 @@
     "test:watch": "nodemon --exec yarn test",
     "test:coverage": "nyc --reporter=lcov --reporter=html --reporter=text yarn run test",
     "build": "rimraf dist && babel -D ./src -d ./dist",
-    "dev": "yarn run build && nodemon -- node ./dist/index.js",
-    "start": "yarn run build && node ./dist/index.js",
+    "dev": "yarn run build && nodemon -- node ./dist/server/index.js",
+    "start": "node ./dist/server/index.js",
     "lint": "eslint ./src",
     "fix": "eslint ./src"
   },
