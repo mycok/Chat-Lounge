@@ -1,9 +1,9 @@
-import app from './Express';
+import server from './Express';
 import config from '../config';
 import logger from '../utils/logger';
 
 const { port } = config;
 
-app.listen(port, () => {
+server.listen(port, () => {
   logger.info(`*****listening on port ${port}*****`);
 });
