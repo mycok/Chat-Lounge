@@ -8,15 +8,16 @@
   },
   "scripts": {
     "preinstall": "yarn global add rimraf",
-    "test": "mocha ./src/**/.test.js ./tests/**/.test.js --require @babel/register",
-    "test:e2e": "mocha ./tests/e2e/*.test.js --require @babel/register",
-    "test:unit": "mocha ./src/**/*.unit.test.js --require @babel/register",
-    "test:integration": "mocha ./src/**/*.integration.test.js --require @babel/register",
+    "heroku-postbuild": "cd client && yarn install --only=dev && yarn install && yarn run build && cd .. && yarn build",
+    "test": "export NODE_ENV=test && dotenv mocha ./src/**/.test.js ./tests/**/.test.js --require @babel/register",
+    "test:e2e": "export NODE_ENV=test && dotenv mocha ./tests/e2e/*.test.js --require @babel/register",
+    "test:unit": "export NODE_ENV=test && dotenv mocha ./src/**/*.unit.test.js --require @babel/register",
+    "test:integration": "export NODE_ENV=test && dotenv mocha ./src/**/*.integration.test.js --require @babel/register",
     "test:watch": "nodemon --exec yarn test",
     "test:coverage": "nyc --reporter=lcov --reporter=html --reporter=text yarn run test",
-    "build": "rimraf dist && babel -D ./src -d ./dist",
-    "dev": "yarn run build && nodemon -- node ./dist/server/index.js",
-    "start": "node ./dist/server/index.js",
+    "build": "rimraf dist && babel -D src -d dist",
+    "dev": "export NODE_ENV=development && yarn run build && dotenv nodemon --watch ./src node ./dist/server/index.js",
+    "start": "node dist/server/index.js",
     "lint": "eslint ./src",
     "fix": "eslint ./src"
   },
@@ -47,6 +48,7 @@
     "@babel/node": "^7.8.7",
     "@babel/preset-env": "^7.9.5",
     "@babel/register": "^7.9.0",
+    "dotenv-cli": "^3.1.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
@@ -64,6 +66,7 @@
     "express": "^4.17.1",
     "helmet": "^3.22.0",
     "mongoose": "^5.9.9",
+    "socket.io": "^2.3.0",
     "winston": "^3.2.1"
   }
 }

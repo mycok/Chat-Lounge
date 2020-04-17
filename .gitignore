@@ -1,13 +1,13 @@
 # dependencies
-/node_modules
+**/node_modules
 /.pnp
 .pnp.js
 
 # testing
-/coverage
+**/coverage
 
 # production
-/build
+**/build
 
 # misc
 .DS_Store
@@ -15,8 +15,8 @@
 .env.development.local
 .env.test.local
 .env.production.local
-.env
-dist
+**.env
+**/dist
 .nyc_output
 /envs
 .vscode/*
