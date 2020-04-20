@@ -14,6 +14,18 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
+  "overrides": [
+    {
+        "files": ["*.test.js"],
+        "env": {
+            "mocha": true
+        },
+        "rules": {
+            "func-names": "off",
+            "prefer-arrow-callback": "off"
+        }
+    }
+],
   rules: {
   },
 };
