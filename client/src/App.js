@@ -6,7 +6,6 @@ import Sidebar from './components/sidebar';
 import Input from './components/input';
 import Messages from './components/message/Messages';
 import Message from './components/message/Message';
-import logger from '../../src/utils/logger';
 
 const people = [
     {
@@ -50,7 +49,7 @@ class App extends Component {
     constructor() {
         super();
         this.state = {
-            socket: socketIOClient('http://localhost:4000'),
+            socket: socketIOClient('https://chat-lounge-api.herokuapp.com/'),
             active: false,
             peopleList: people,
             selectedPerson: people[0],
@@ -69,7 +68,7 @@ class App extends Component {
 
         });
         socket.on('disconnect', () => {
-            logger.info('Disconnected from the server!');
+            console.log('Disconnected from the server!');
         });
 
         this.connections();
@@ -79,7 +78,7 @@ class App extends Component {
     connections = () => {
         const { socket } = this.state;
         socket.on('newConnection', (message) => {
-            logger.info('new user joined');
+            console.log('new user joined');
             this.setState({ message: message })
 
         })
@@ -89,7 +88,7 @@ class App extends Component {
         const { socket } = this.state;
         // listen to a newMessage event from thee server and perform further actions based on the recieved data
         socket.on('createMessage', (newMessage) => {
-            logger.info('Yeaahhh, just recieved a new message!!!!', newMessage);
+            console.log('Yeaahhh, just recieved a new message!!!!', newMessage);
             this.setState({ message: newMessage });
         });
     }
@@ -110,7 +109,7 @@ class App extends Component {
             from: '@myckie',
             text: message,
         }, (serverAckwoledgement) => {
-            logger.info('Got it!!!', serverAckwoledgement);
+            console.log('Got it!!!', serverAckwoledgement);
         });
     }
 
@@ -120,7 +119,7 @@ class App extends Component {
 
     render() {
         const { message, messageList, active, peopleList, selectedPerson } = this.state;
-        active && logger.info('Connected to server!');
+        active && console.log('Connected to server!');
         return (
             <Grid container>
                 <Grid item xs={2}>
