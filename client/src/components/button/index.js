@@ -1,7 +1,6 @@
 import React from 'react';
 import { Fab } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import SendIcon from '@material-ui/icons/SendSharp';
 
 const useStyles = makeStyles((theme) => ({
     button: {
@@ -13,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Button = ({ title, handler }) => {
+const Button = ({ title, handler, Icon }) => {
     const buttonStyles = useStyles()
     return (
             <Fab
@@ -22,7 +21,7 @@ const Button = ({ title, handler }) => {
                 className={buttonStyles.button}
                 onClick={handler}
             >
-                <SendIcon fontSize="small" className={buttonStyles.icon}/>
+                <Icon fontSize="small" className={buttonStyles.icon}/>
                 {title}
             </Fab>
     )

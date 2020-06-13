@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import { TextField, InputAdornment } from '@material-ui/core';
 import MessageIcon from '@material-ui/icons/KeyboardArrowRightSharp';
+import SendIcon from '@material-ui/icons/SendSharp';
+import LocationIcon from '@material-ui/icons/LocationOnSharp';
 
 import Button from '../button';
 
@@ -30,6 +32,7 @@ const Input = ({ sendMessage, sendLocation }) => {
                     size='medium'
                     value={message}
                     variant='standard'
+                    rowsMax={4}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -39,11 +42,12 @@ const Input = ({ sendMessage, sendLocation }) => {
                         disableUnderline: true
                     }}
                     onChange={handleOnChange}
+                    style={{ width: '97.6%', marginLeft: '0.8em', marginRight: '2em', }}
                 />
             </div>
             <div style={{ position: 'absolute', bottom: '0.5em', right: 0 }}>
-                <Button title='Send' handler={handleSendMessage} />
-                <Button title='Send Location' handler={sendLocation} />
+                <Button title='Send' handler={handleSendMessage} Icon={SendIcon} />
+                <Button title='Send Location' handler={sendLocation} Icon={LocationIcon} />
             </div>
         </>
     )

@@ -1,29 +1,49 @@
 import React from 'react';
 
-import { TextField, InputAdornment, Avatar } from '@material-ui/core';
+import { List, ListItem, ListItemAvatar, ListItemText, Avatar, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
-const Message = ({ message }) => {
-    const { text, recieved } = message;
+const useStyles = makeStyles((theme) => ({
+    root: {
+        width: '100%',
+        backgroundColor: theme.palette.background.paper,
+    },
+    inline: {
+        display: 'inline',
+    },
+}));
+
+const Message = ({ message, selectedPerson }) => {
+    const classes = useStyles()
+    const { text, from, recieved } = message;
+    // const { name } = selectedPerson;
+
     return (
         <>
-            <div style={{ left: recieved && '0.5em', float: !recieved && 'right', width: '50%', border: '1px solid gray', borderRadius: recieved ? '0px 25px 25px' : '25px 25px 0px', margin: '0.5em' }}>
-                <TextField
-                    name='recieved-message'
-                    id='recieved-message'
-                    fullWidth={true}
-                    multiline={true}
-                    size='medium'
-                    value={text}
-                    variant='standard'
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start" style={{ marginLeft: '0.3em', marginRight: '0.8em' }}>
-                                <Avatar src="" alt="KM" style={{ width: 22, height: 22, border: '1px solid #ffa500' }} />
-                            </InputAdornment>
-                        ),
-                        disableUnderline: true
-                    }}
-                />
+            <div style={{ width: '70%', marginLeft: (recieved) ? '6em' : '12em', marginTop: '1.5em' }}>
+                <List className={classes.root}>
+                    <ListItem alignItems="flex-start">
+                        <ListItemAvatar>
+                            <Avatar alt="Remy Sharp" src="" />
+                        </ListItemAvatar>
+                        <ListItemText
+                            primary={from}
+                            secondary={
+                                <React.Fragment>
+                                <span style={{ display: 'block' }}>Wed April 22 2020, 02:45 AM</span>
+                                    <Typography
+                                        component="span"
+                                        variant="body2"
+                                        className={classes.inline}
+                                        color="textPrimary"
+                                    >
+                                        {text}
+                                    </Typography>
+                                </React.Fragment>
+                            }
+                        />
+                    </ListItem>
+                </List>
             </div>
         </>
     )

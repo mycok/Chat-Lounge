@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/', express.static(path.join(__dirname, '../../client/build')));
 
 io.on('connection', (socket) => {
-  logger.info('new client connection!!!');
+  // logger.info('new client connection!!!');
   // emit this specific event and data to the sender's socket each time a new user joins the app
   socket.emit('newConnection', generateMessage('@admin', 'Welcome to chat-lounge'));
   socket.broadcast.emit('newConnection', generateMessage('@admin', 'A new user has joined'));
@@ -34,23 +34,26 @@ io.on('connection', (socket) => {
     logger.info('New message recieved', message);
     // emit the specific event and event data to a specific active connection / socket on the client
     // socket.emit('newMessage', generateMessage('@myckie', 'Hey man, how is everything'));
+
     // emit the event and event data to every active connection / socket
-    // io.emit('createMessage', {
-    //   from: message.from,
-    //   text: message.text,
-    //   createdAt: new Date().toDateString(),
-    // });
-    // callback();
+    socket.emit('newMessage', message);
+    callback('This is from the server!!');
+
     // broadcast the event and data to every active socket other than
     //  the socket that triggered the event
-    socket.broadcast.emit('createMessage', {
-      from: message.from,
-      text: message.text,
-      createdAt: new Date().getTime(),
-    });
-    callback('This is from the server');
+    //   socket.broadcast.emit('createMessage', {
+    //     from: message.from,
+    //     text: message.text,
+    //     createdAt: new Date().getTime(),
+    //   });
+    //   callback('This is from the server!!');
+    // });
+    socket.on('disconnect', () => logger.info('client disconnected!!!'));
   });
-  socket.on('disconnect', () => logger.info('client disconnected!!!'));
+
+  socket.on('shareLocation', (location) => {
+    socket.emit('newMessage', generateMessage('@admin', `${location.latitude}, ${location.longitude}`));
+  });
 });
 
 export default server;
