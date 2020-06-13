@@ -2,10 +2,11 @@ import React from 'react';
 
 import Message from './Message';
 
-const Messages = ({ messageList }) => (
+const Messages = ({ messageList, selectedPerson }) => (
         messageList.map((message) => {
+                const { from } = message;
                 return (
-                        <Message message={message} />
+                        <Message key={`${from}${Math.floor(Math.random() * 1000000)}`}message={message} selectedPerson={selectedPerson} />
                 )
         })
 )

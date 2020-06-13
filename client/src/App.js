@@ -1,15 +1,15 @@
-import React, { Component, memo } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import socketIOClient from 'socket.io-client';
 import { Grid } from '@material-ui/core';
 
 import Sidebar from './components/sidebar';
 import Input from './components/input';
 import Messages from './components/message/Messages';
-import Message from './components/message/Message';
+// import Message from './components/message/Message';
 
 const people = [
     {
-        name: '@awesomeme155rttyu',
+        name: '@myckol',
         status: 'offline',
         messages: [
             {
@@ -26,7 +26,22 @@ const people = [
                 from: '@user2',
                 text: `Hi Aude, Please keep my file open. I unfortunately can’t give you an exact date of when I will be in position to finalize my subscription since am dealing with a very big business setback at the moment. Am doing everything I can to fix it and will contact you was soon as everything is running smoothly again.`,
                 recieved: true
-            }
+            },
+            {
+                from: '@myckol',
+                text: 'We need a new implementation of the nav bar',
+                recieved: false
+            },
+            {
+                from: '@myckol',
+                text: 'i think material-ui library will work better',
+                recieved: false
+            },
+            {
+                from: '@myckol',
+                text: 'i think material-ui library will work better',
+                recieved: false
+            },
         ]
     },
     {
@@ -45,105 +60,116 @@ const people = [
         messages: []
     }
 ];
-class App extends Component {
-    constructor() {
-        super();
-        this.state = {
-            socket: socketIOClient('https://chat-lounge-api.herokuapp.com/'),
-            active: false,
-            peopleList: people,
-            selectedPerson: people[0],
-            messageList: [people[0].messages],
-            message: {
-                from: '',
-                text: ''
-            },
-        };
-    }
+const socket = socketIOClient('http://localhost:4000' || 'https://chat-lounge-api.herokuapp.com/');
+// TODO
+// - display created messages with Message component each time a user hits send
+// - store that new message somewhere such that that same component can be used to display another new message
+// - find a way to display a list of all created messages may be by appending to a state new messages array
+const App = () => {
+    const [active, setActive] = useState(false);
+    const [peopleList, setPeopleList] = useState(people);
+    const [selectedPerson, setSelectedPerson] = useState(people[0]);
+    const [messageList, setMessageList] = useState([...people[0].messages]);
+    const [message, setMessage] = useState({ from: '', text: '' });
+    const divRef = useRef();
 
-    componentDidMount() {
-        const { socket } = this.state;
-        socket.on('connect', () => {
-            this.setState({ active: true });
-
-        });
-        socket.on('disconnect', () => {
-            console.log('Disconnected from the server!');
-        });
-
-        this.connections();
-        this.recieveNewMessage();
-    }
-
-    connections = () => {
-        const { socket } = this.state;
+    const connections = useCallback(() => {
         socket.on('newConnection', (message) => {
             console.log('new user joined');
-            this.setState({ message: message })
-
+            const serverMessage = { ...message, recieved: true }
+            const messages = [...messageList];
+            messages.push(serverMessage);
+            setMessageList(messages);
         })
-    }
+    }, [messageList])
 
-    recieveNewMessage = () => {
-        const { socket } = this.state;
-        // listen to a newMessage event from thee server and perform further actions based on the recieved data
-        socket.on('createMessage', (newMessage) => {
-            console.log('Yeaahhh, just recieved a new message!!!!', newMessage);
-            this.setState({ message: newMessage });
+    const recieveNewMessage = useCallback(() => {
+        // listen to a newMessage event from the server and perform further actions based on the recieved data
+        socket.on('newMessage', (message) => {
+            console.log('Yeaahhh, just recieved a new message!!!!', message);
+            // setMessage(message);
+            const messages = [...messageList];
+            messages.push(message);
+            setMessageList(messages);
         });
-    }
+    }, [messageList])
 
-    displayMessageList = (name) => {
-        const { peopleList } = this.state;
+    const displayMessageList = (name) => {
         const selPerson = peopleList.filter((person) => person.name === name);
-
-        this.setState({ selectedPerson: selPerson[0], messageList: selPerson[0].messages });
+        setSelectedPerson(selPerson[0]);
+        setMessageList(selPerson[0].messages);
     }
 
-    sendMessage = (message) => {
-        const { socket } = this.state;
+    const sendMessage = (message) => {
         // emit a createMessage event and data to the a specific active socket on the server
         // pass a function as a third argument to the emit function
         // to read the ackwoledgement data from the server and act accordingly
         socket.emit('createMessage', {
-            from: '@myckie',
+            from: '@myckol',
             text: message,
         }, (serverAckwoledgement) => {
             console.log('Got it!!!', serverAckwoledgement);
         });
     }
 
-    sendLocation = () => {
+    const sendLocation = () => {
+        if (!navigator.geolocation) {
+            return alert('Geolocation not supported by your browser');
+        }
+        navigator.geolocation.getCurrentPosition((position) => {
+            const { coords: { latitude, longitude } } = position;
 
+            socket.emit('shareLocation', { latitude, longitude });
+        }, (error) => {
+            alert('We need your permission to share your location')
+        });
     }
 
-    render() {
-        const { message, messageList, active, peopleList, selectedPerson } = this.state;
-        active && console.log('Connected to server!');
-        return (
-            <Grid container>
-                <Grid item xs={2}>
-                    <Sidebar
-                        peopleList={peopleList}
-                        selectedPerson={selectedPerson}
-                        displayMessageList={this.displayMessageList}
-                    />
-                </Grid>
-                <Grid item xs={10}>
-                <div>
-                    <Messages  messageList={messageList} />
-                    {
-                        message.text && <Message message={message} />
-                    }
-                </div>
-                    <Input
-                        sendMessage={this.sendMessage}
-                        sendLocation={this.sendLocation}
-                    />
-                </Grid>
+    useEffect(() => {
+        const scrollElement = divRef.current;
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+    });
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            setActive(true);
+        });
+        socket.on('disconnect', () => {
+            console.log('Disconnected from the server!');
+        });
+
+        connections();
+        recieveNewMessage();
+
+        return () => {
+            socket.off('newConnection');
+            socket.off('newMessage');
+        }
+    }, [connections, recieveNewMessage]);
+
+    return (
+        <Grid container>
+            <Grid item xs={2}>
+                <Sidebar
+                    peopleList={peopleList}
+                    selectedPerson={selectedPerson}
+                    displayMessageList={displayMessageList}
+                />
             </Grid>
-        )
-    }
+            <Grid item xs={10}>
+                <div ref={divRef} style={{ height: '90vh', overflowY: 'auto' }}>
+                    <Messages messageList={messageList} selectedPerson={selectedPerson} />
+                    {/* {
+                        message.text && <Message message={message} selectedPerson={selectedPerson} />
+                    } */}
+                </div>
+                <Input
+                    sendMessage={sendMessage}
+                    sendLocation={sendLocation}
+                />
+            </Grid>
+        </Grid>
+    )
 }
 
-export default memo(App);
+export default App;
